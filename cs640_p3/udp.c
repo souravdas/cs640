@@ -10,7 +10,7 @@ void* recvUdpMsg(void *socket_desc)
         memset(server_reply,0,MAXLEN);
         if (recvfrom(sock, server_reply , MAXLEN, 0, NULL, NULL)>0)
         {
-            printf("Recv Udp Msg: %s", server_reply);
+            printf("%s", server_reply);
         }
     }
 }
@@ -100,7 +100,7 @@ void initUdpServer(char *hname, char *port, int kflag)
     {
         if(recvfrom(socket_desc ,buffer , MAXLEN, 0, (SA*)&remaddr, &len)>0)
         {
-            printf("Recv Udp Msg: %s", buffer);
+            printf("%s", buffer);
 
             if (pthread_create(&listener_thread , NULL , recvUdpMsg, (void*) new_sock) < 0)
             {

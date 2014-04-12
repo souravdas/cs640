@@ -9,7 +9,7 @@ void* recvMsg(void *socket_desc)
         char server_reply[MAXLEN];
         if(recv(sock, server_reply , MAXLEN , 0)>0)
         {
-            printf("Recv Msg: %s", server_reply);
+            printf("%s", server_reply);
         }
         else
         {
