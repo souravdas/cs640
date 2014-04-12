@@ -16,6 +16,7 @@ void* recvMsg(void *socket_desc)
             pthread_cancel(send_thread);
             break;
         }
+        memset(server_reply,0,MAXLEN);
     }
     return NULL;
 }
@@ -27,11 +28,13 @@ void* sendMsg(void *socket_desc)
     int sock = *(int*)socket_desc;
     while (fgets(buffer, MAXLEN, stdin) != NULL)
     {
+        //if(buffer[0] == '\n') continue;
         if( send(sock ,  buffer , strlen(buffer) , 0) < 0)
         {
             printf("[Error:] Send failed\n");
             return NULL;
         }
+        memset(buffer,0,MAXLEN);       
     }
     pthread_cancel(recv_thread);
     return NULL;
