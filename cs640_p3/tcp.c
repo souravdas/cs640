@@ -17,7 +17,7 @@ void* recvMsg(void *socket_desc)
             break;
         }
     }
-    
+    return NULL;
 }
 
 void* sendMsg(void *socket_desc)
@@ -30,23 +30,19 @@ void* sendMsg(void *socket_desc)
         if( send(sock ,  buffer , strlen(buffer) , 0) < 0)
         {
             printf("[Error:] Send failed\n");
-            return;
+            return NULL;
         }
     }
     pthread_cancel(recv_thread);
+    return NULL;
 }
 
 void initTcpClient(char *hname, char *port, char *saddr)
 {
     int socket_desc, *new_sock, i;
-    struct sockaddr_in server, myaddr;
-    char buffer[MAXLEN];
-    
-    struct sockaddr_in addr;
+    struct sockaddr_in server, myaddr, addr;
     struct hostent *he;
     struct in_addr **addr_list;
-
-    pthread_t sniffer_thread;
 
     if (hname)
     {
@@ -159,8 +155,6 @@ void initTcpServer(char *hname, char *port, int kflag)
     struct sockaddr_in addr;
     int i,socket_desc , new_socket , c, *new_sock;
     struct sockaddr_in server , client;
-    pthread_t sniffer_thread;
-    char buffer[MAXLEN];
     struct hostent *he;
     struct in_addr **addr_list;
 

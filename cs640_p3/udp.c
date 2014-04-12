@@ -14,6 +14,23 @@ void* recvUdpMsg(void *socket_desc)
     }
 }
 
+void* sendUdpMsg(void *args)
+{
+    char buffer[MAXLEN];
+    params *param = (params*) args;
+    int sock = param->socket_desc;
+
+    while (fgets(buffer, MAXLEN, stdin) != NULL)
+    {
+        if (sendto(sock, buffer , strlen(buffer) , 0, (SA*)&(param->remaddr), param->len) < 0)
+        {
+            printf("Send failed\n");
+            return NULL;
+        }
+    }
+    return NULL;
+}
+
 void initUdpServer(char *hname, char *port, int kflag)
 {
     char buffer[MAXLEN];
@@ -21,8 +38,8 @@ void initUdpServer(char *hname, char *port, int kflag)
     struct sockaddr_in server, addr, remaddr;
     struct hostent *he;
     struct in_addr **addr_list;
-    pthread_t listener_thread;
-
+    pthread_t listener_thread, snd_thread;
+    params *args = (params*) malloc (sizeof(params));
     socklen_t len = sizeof(server);
     memset(&server,sizeof(struct sockaddr_in),0);
 
@@ -89,8 +106,11 @@ void initUdpServer(char *hname, char *port, int kflag)
                 return;
             }
         }
+        args->remaddr = remaddr;
+        args->len = len;
+        args->socket_desc = socket_desc;
 
-        while (fgets(buffer, MAXLEN, stdin) != NULL)
+        /*while (fgets(buffer, MAXLEN, stdin) != NULL)
         {
             if (sendto(socket_desc , buffer , strlen(buffer) , 0, (SA*)&remaddr, len) < 0)
             {
@@ -98,7 +118,15 @@ void initUdpServer(char *hname, char *port, int kflag)
                return;
             }
         //puts("Data Sent");
+        }*/
+        if (pthread_create(&snd_thread , NULL , sendUdpMsg, (void*) args) < 0)
+        {
+            printf("[Error:] Could not create listen thread\n");
+            return;
         }
+
+        pthread_join(snd_thread, NULL);
+        pthread_join(listener_thread, NULL);
         pthread_cancel(listener_thread);
         
         if (!kflag)
@@ -109,13 +137,12 @@ void initUdpServer(char *hname, char *port, int kflag)
 
 void initUdpClient(char *hname, char *port, char *saddr)
 {
-    char buffer[MAXLEN];
     int *new_sock, socket_desc, i;
     struct sockaddr_in server, addr, myaddr;
     struct hostent *he;
     struct in_addr **addr_list;
-    pthread_t listener_thread;
-
+    pthread_t listener_thread, snd_thread;
+    params *args = (params*) malloc (sizeof(params));
     socklen_t len = sizeof(server);
     memset((char *)&server,sizeof(struct sockaddr_in),0);
 
@@ -174,8 +201,6 @@ void initUdpClient(char *hname, char *port, char *saddr)
     }
 
     myaddr.sin_family = AF_INET;
-
-
     myaddr.sin_port = htons(0);
 
     if (bind(socket_desc, (struct sockaddr *)&myaddr, sizeof(myaddr)) < 0)
@@ -192,8 +217,10 @@ void initUdpClient(char *hname, char *port, char *saddr)
         printf("[Error:] Could not create listen thread\n");
         return;
     }
-
-    while (fgets(buffer, MAXLEN, stdin) != NULL)
+    args->remaddr = server;
+    args->len = len;
+    args->socket_desc = socket_desc;
+    /*while (fgets(buffer, MAXLEN, stdin) != NULL)
     {
         if (sendto(socket_desc , buffer , strlen(buffer) , 0, (SA*)&server, len) < 0)
         {
@@ -201,7 +228,16 @@ void initUdpClient(char *hname, char *port, char *saddr)
             return;
         }
     }
-    pthread_cancel(listener_thread);
+    */
+
+    if (pthread_create(&snd_thread , NULL , sendUdpMsg, (void*) args) < 0)
+    {
+        printf("[Error:] Could not create listen thread\n");
+        return;
+    }
+
+    pthread_join(snd_thread, NULL);
+    pthread_join(listener_thread, NULL);
     close(socket_desc);
 }
 
