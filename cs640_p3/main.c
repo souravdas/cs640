@@ -30,12 +30,7 @@ int main (int argc, char* argv[])
                 printhelp();
                 return 1;
             case '?':
-                if (optopt == 's')
-                    printf("[Error:] Option -%c requires an argument.\n", optopt);                 
-                else if (isprint(optopt))
-                    printf("[Error:] Unknown Option '-%c'.\n", optopt);
-                else
-                    printf("[Error:] Unknown Option Character '\\x%x'.\n", optopt);
+                printf("internal error\n");
                 return -1;
             default:
                 abort();
@@ -62,7 +57,7 @@ int main (int argc, char* argv[])
 
     printf(" [Debug:] lflag = %d, kflag = %d, sflag = %d, uflag = %d, saddr = %s \n", lflag, kflag, sflag, uflag, saddr);
 
-    if (lflag && !uflag)
+    if (lflag && !uflag) 	
         initTcpServer(hname, port, kflag); 
     else if (lflag && uflag)
         initUdpServer(hname, port, kflag);
@@ -75,5 +70,3 @@ int main (int argc, char* argv[])
 	
 	
 }
-
-
