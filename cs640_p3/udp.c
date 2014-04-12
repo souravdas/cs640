@@ -134,7 +134,9 @@ void initUdpServer(char *hname, char *port, int kflag)
         if (!kflag)
            break; 
     }
+    free(args);
     close(socket_desc);
+    
 }
 
 void initUdpClient(char *hname, char *port, char *saddr)
@@ -241,5 +243,6 @@ void initUdpClient(char *hname, char *port, char *saddr)
     pthread_join(snd_thread, NULL);
     pthread_join(listener_thread, NULL);
     close(socket_desc);
+    free(args);
 }
 

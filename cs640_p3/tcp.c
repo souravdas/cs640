@@ -95,7 +95,7 @@ void initTcpClient(char *hname, char *port, char *saddr)
     {
         if (!GetIPfromString(saddr, &myaddr))
         {
-             printf("[Error:] Invalid saddr provided\n");
+             printf("internal error\n");
              return;
         }
     }
@@ -151,6 +151,7 @@ void initTcpClient(char *hname, char *port, char *saddr)
     //pthread_cancel(sniffer_thread);
     shutdown(socket_desc,2);
     close(socket_desc);
+    free(new_sock);
 }
 
 void initTcpServer(char *hname, char *port, int kflag)
@@ -244,6 +245,7 @@ void initTcpServer(char *hname, char *port, int kflag)
         pthread_join(recv_thread, NULL);
         pthread_join(send_thread, NULL);
         close(new_socket);
+        free(new_sock);
         if (!kflag)
             break;
     }
