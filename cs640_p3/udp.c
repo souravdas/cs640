@@ -7,6 +7,7 @@ void* recvUdpMsg(void *socket_desc)
     while (TRUE)
     {
         char server_reply[MAXLEN];
+        memset(server_reply,0,MAXLEN);
         if (recvfrom(sock, server_reply , MAXLEN, 0, NULL, NULL)>0)
         {
             printf("Recv Udp Msg: %s", server_reply);
@@ -27,6 +28,7 @@ void* sendUdpMsg(void *args)
             printf("Send failed\n");
             return NULL;
         }
+        memset(buffer, 0, MAXLEN);
     }
     return NULL;
 }
