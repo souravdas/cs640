@@ -3,13 +3,12 @@
 
 int main (int argc, char* argv[])
 {
-    //printf("Chat Application \n");
     int index = 0, c = 0, lflag = 0, kflag = 0, sflag = 0, uflag = 0;
     char *saddr = NULL, *hname = NULL, *port = NULL;
 
     /*Parse the Options*/
     opterr = 0;
-    while ((c = getopt(argc, argv, "+lkuhs:")) != -1)
+    while ((c = getopt(argc, argv, "+lkus:")) != -1)
     {
         switch (c)
         {
@@ -41,7 +40,6 @@ int main (int argc, char* argv[])
     {
         if ((argc - index) == 0 || (argc - index) > 2)
         {
-            //printf("[Error:] Specify the hostname[optional] and port correctly \n ");
             printerror();
             return -1;
         }
@@ -56,7 +54,7 @@ int main (int argc, char* argv[])
        return -1;
     }
 
-    printf(" [Debug:] lflag = %d, kflag = %d, sflag = %d, uflag = %d, saddr = %s hname = %s, port = %s\n", lflag, kflag, sflag, uflag, saddr,hname,port);
+    //printf(" [Debug:] lflag = %d, kflag = %d, sflag = %d, uflag = %d, saddr = %s hname = %s, port = %s\n", lflag, kflag, sflag, uflag, saddr,hname,port);
 
     if (lflag && !uflag) 	
         initTcpServer(hname, port, kflag); 
@@ -67,7 +65,5 @@ int main (int argc, char* argv[])
     else
         initUdpClient(hname, port, saddr);
 
-    return 1;
-	
-	
+    return 1;	
 }

@@ -30,7 +30,7 @@ void* sendUdpMsg(void *args)
     {
         if (sendto(sock, buffer , strlen(buffer) , 0, (SA*)&(param->remaddr), param->len) < 0)
         {
-            printf("Send failed\n");
+            printinterror();//    printf("Send failed\n");
             return NULL;
         }
         memset(buffer, 0, MAXLEN);
@@ -58,7 +58,7 @@ void initUdpServer(char *hname, char *port, int kflag)
             if ( (he = gethostbyname( hname ) ) == NULL)
             {
 
-                printf("gethostbyname failed \n");
+                printinterror(); //printf("gethostbyname failed \n");
                 return;
             }
             addr_list = (struct in_addr **) he->h_addr_list;
@@ -78,7 +78,7 @@ void initUdpServer(char *hname, char *port, int kflag)
     socket_desc = socket(AF_INET ,SOCK_DGRAM , 0);
     if (socket_desc == -1)
     {
-        printf("[Error:] Could not create socket");
+        printinterror(); //printf("[Error:] Could not create socket");
     }
     //else
     //    printf("Udp Client Socket Created Successfully\n");
@@ -93,7 +93,7 @@ void initUdpServer(char *hname, char *port, int kflag)
     /*Bind*/
     if( bind(socket_desc,(SA *)&server , sizeof(server)) < 0)
     {
-        printf("[Error:] Bind failed\n");
+        printinterror(); //printf("[Error:] Bind failed\n");
         return;
     }
     //printf("Bind done\n");
@@ -109,7 +109,7 @@ void initUdpServer(char *hname, char *port, int kflag)
 
             if (pthread_create(&listener_thread , NULL , recvUdpMsg, (void*) new_sock) < 0)
             {
-                printf("[Error:] Could not create listen thread\n");
+                printinterror(); //printf("[Error:] Could not create listen thread\n");
                 return;
             }
         }
@@ -128,7 +128,7 @@ void initUdpServer(char *hname, char *port, int kflag)
         }*/
         if (pthread_create(&snd_thread , NULL , sendUdpMsg, (void*) args) < 0)
         {
-            printf("[Error:] Could not create listen thread\n");
+            printinterror(); //printf("[Error:] Could not create listen thread\n");
             return;
         }
 
@@ -136,11 +136,12 @@ void initUdpServer(char *hname, char *port, int kflag)
         pthread_join(listener_thread, NULL);
         pthread_cancel(listener_thread);
         
-        if (!kflag)
-           break; 
+        //if (!kflag)
+        //   break; 
     }
     free(args);
     close(socket_desc);
+    free(new_sock);
     
 }
 
@@ -163,7 +164,7 @@ void initUdpClient(char *hname, char *port, char *saddr)
             if ( (he = gethostbyname( hname ) ) == NULL)
             {
 
-                printf("gethostbyname failed \n");
+                printinterror(); //printf("gethostbyname failed \n");
                 return;
             }
             addr_list = (struct in_addr **) he->h_addr_list;
@@ -178,7 +179,7 @@ void initUdpClient(char *hname, char *port, char *saddr)
     }
     else
     {
-        printf("[Error:] Why is Dst IP not given? \n");
+        printinterror(); //printf("[Error:] Why is Dst IP not given? \n");
         return;
     }
 
@@ -186,7 +187,7 @@ void initUdpClient(char *hname, char *port, char *saddr)
     socket_desc = socket(AF_INET ,SOCK_DGRAM , 0);
     if (socket_desc == -1)
     {
-        printf("[Error:] Could not create socket");
+        printinterror(); //printf("[Error:] Could not create socket");
     }
     //else
     //    printf("Udp Client Socket Created Successfully\n");
@@ -204,7 +205,7 @@ void initUdpClient(char *hname, char *port, char *saddr)
     {
         if (!GetIPfromString(saddr, &myaddr))
         {
-             printf("internal error\n");
+             printinterror(); //printf("internal error\n");
              return;
         }
     }
@@ -214,7 +215,7 @@ void initUdpClient(char *hname, char *port, char *saddr)
 
     if (bind(socket_desc, (struct sockaddr *)&myaddr, sizeof(myaddr)) < 0)
     {
-        printf("bind failed\n");
+        printinterror(); //printf("bind failed\n");
         return;
     }
 
@@ -223,7 +224,7 @@ void initUdpClient(char *hname, char *port, char *saddr)
 
     if (pthread_create(&listener_thread , NULL , recvUdpMsg , (void*) new_sock) < 0)
     {
-        printf("[Error:] Could not create listen thread\n");
+        printinterror(); //printf("[Error:] Could not create listen thread\n");
         return;
     }
     args->remaddr = server;
@@ -241,7 +242,7 @@ void initUdpClient(char *hname, char *port, char *saddr)
 
     if (pthread_create(&snd_thread , NULL , sendUdpMsg, (void*) args) < 0)
     {
-        printf("[Error:] Could not create listen thread\n");
+        printinterror(); //printf("[Error:] Could not create listen thread\n");
         return;
     }
 
@@ -249,5 +250,6 @@ void initUdpClient(char *hname, char *port, char *saddr)
     pthread_join(listener_thread, NULL);
     close(socket_desc);
     free(args);
+    free(new_sock);
 }
 

@@ -31,7 +31,8 @@ void* sendMsg(void *socket_desc)
         //if(buffer[0] == '\n') continue;
         if( send(sock ,  buffer , strlen(buffer) , 0) < 0)
         {
-            printf("[Error:] Send failed\n");
+            printinterror();
+            //printf("[Error:] Send failed\n");
             return NULL;
         }
         memset(buffer,0,MAXLEN);       
@@ -55,8 +56,8 @@ void initTcpClient(char *hname, char *port, char *saddr)
         {
             if ( (he = gethostbyname( hname ) ) == NULL)
             {
-
-                printf("gethostbyname failed \n");
+                printinterror();
+                //printf("gethostbyname failed \n");
                 return;
             }
             addr_list = (struct in_addr **) he->h_addr_list;
@@ -71,7 +72,8 @@ void initTcpClient(char *hname, char *port, char *saddr)
     }
     else
     {
-        printf("[Error:] Why is Dst IP not given?\n");
+        printinterror();
+        //printf("[Error:] Why is Dst IP not given?\n");
         return;
     }
 
@@ -79,12 +81,13 @@ void initTcpClient(char *hname, char *port, char *saddr)
     socket_desc = socket(AF_INET , SOCK_STREAM , 0);
     if (socket_desc == -1)
     {
-        printf("[Error:] Could not create socket");
+        printinterror();
+        //printf("[Error:] Could not create socket");
     }
 
     if (setsockopt(socket_desc, SOL_SOCKET, (SO_REUSEADDR), (char*) &option, sizeof(option)) < 0)
     {
-        printf("internal error\n");
+        printinterror(); //printf("internal error\n");
     }
 
     server.sin_addr = addr.sin_addr ;
@@ -100,7 +103,7 @@ void initTcpClient(char *hname, char *port, char *saddr)
     {
         if (!GetIPfromString(saddr, &myaddr))
         {
-             printf("internal error\n");
+             printinterror();//printf("internal error\n");
              return;
         }
     }
@@ -112,14 +115,14 @@ void initTcpClient(char *hname, char *port, char *saddr)
 
     if (bind(socket_desc, (struct sockaddr *)&myaddr, sizeof(myaddr)) < 0)
     {
-        printf("bind failed\n");
+        printinterror(); //printf("bind failed\n");
         return;
     }
 
 
     if (connect(socket_desc , (struct sockaddr *)&server , sizeof(server)) < 0)
     {
-        printf("{Error:] connect error\n");
+        printinterror();//printf("{Error:] connect error\n");
         return ;
     }
     //puts("Connected");
@@ -128,13 +131,13 @@ void initTcpClient(char *hname, char *port, char *saddr)
 
     if( pthread_create( &recv_thread , NULL , recvMsg , (void*) new_sock) < 0)
     {
-       printf("[Error:] Could not create listen thread\n");
+       printinterror();// printf("[Error:] Could not create listen thread\n");
        return;
     }
  
     if( pthread_create( &send_thread , NULL , sendMsg , (void*) new_sock) < 0)
     {
-       printf("[Error:] Could not create listen thread\n");
+       printinterror();// printf("[Error:] Could not create listen thread\n");
        return;
     }
   
@@ -174,7 +177,8 @@ void initTcpServer(char *hname, char *port, int kflag)
         {
             if ( (he = gethostbyname( hname ) ) == NULL)
             {
-               printf("gethostbyname failed \n");
+                printinterror();
+                //printf("gethostbyname failed \n");
                 return;
             }
             addr_list = (struct in_addr **) he->h_addr_list;
@@ -184,7 +188,7 @@ void initTcpServer(char *hname, char *port, int kflag)
             }
 
         }
-        printf("[debug:] GetIPfromString - IPAdress is %s\n", inet_ntoa(addr.sin_addr));
+        //printf("[debug:] GetIPfromString - IPAdress is %s\n", inet_ntoa(addr.sin_addr));
         server.sin_addr = addr.sin_addr;
     }
     else
@@ -195,12 +199,14 @@ void initTcpServer(char *hname, char *port, int kflag)
     socket_desc = socket(AF_INET , SOCK_STREAM , 0);
     if (socket_desc == -1)
     {
-        printf("[Error:] Could not create socket\n");
+        printinterror();
+        //printf("[Error:] Could not create socket\n");
     }
 
     if (setsockopt(socket_desc, SOL_SOCKET, (SO_REUSEADDR), (char*) &option, sizeof(option)) < 0)
     {
-        printf("internal error\n");
+        printinterror();
+        //printf("internal error\n");
     }
     /*Prepare the sockaddr_in structure*/
     server.sin_family = AF_INET;
@@ -209,7 +215,8 @@ void initTcpServer(char *hname, char *port, int kflag)
     /*Bind*/
     if( bind(socket_desc,(struct sockaddr *)&server , sizeof(server)) < 0)
     {
-        printf("[Error:] Bind failed\n");
+        printinterror();
+        //printf("[Error:] Bind failed\n");
         return;
     }
     //printf("Bind done\n");
@@ -226,8 +233,9 @@ void initTcpServer(char *hname, char *port, int kflag)
         *new_sock = new_socket;
         if( pthread_create( &recv_thread , NULL , recvMsg , (void*) new_sock) < 0)
         {
-           printf("[Error:] Could not create listen thread\n");
-           return;
+             printinterror();
+             //printf("[Error:] Could not create listen thread\n");
+             return;
         }
 
 /*        while (fgets(buffer, MAXLEN, stdin) != NULL)
@@ -246,7 +254,8 @@ void initTcpServer(char *hname, char *port, int kflag)
 
         if( pthread_create( &send_thread , NULL , sendMsg , (void*) new_sock) < 0)
         {
-           printf("[Error:] Could not create listen thread\n");
+           printinterror();
+           //printf("[Error:] Could not create listen thread\n");
            return;
         }
 
