@@ -5,7 +5,7 @@ int main (int argc, char* argv[])
 {
     int index = 0, c = 0, lflag = 0, kflag = 0, sflag = 0, uflag = 0;
     char *saddr = NULL, *hname = NULL, *port = NULL;
-
+    
     /*Parse the Options*/
     opterr = 0;
     while ((c = getopt(argc, argv, "+lkus:")) != -1)
@@ -21,6 +21,9 @@ int main (int argc, char* argv[])
             case 's':
                 sflag = 1;
                 saddr = optarg;
+                //printf("%s",saddr);
+                if (saddr[0] == '-')
+                    printerror();
                 break;
             case 'u':
                 uflag = 1;
@@ -29,13 +32,19 @@ int main (int argc, char* argv[])
                 printhelp();
                 return 1;
             case '?':
-                printf("internal error\n");
+                printerror();
                 return -1;
             default:
                 abort();
         }
     }
-    
+            
+    if ((argc - optind) == 0 || (argc - optind) > 2)
+    {
+        printerror();
+        return -1;
+    }
+     
     for (index = optind; index < argc; index++)
     {
         if ((argc - index) == 0 || (argc - index) > 2)
