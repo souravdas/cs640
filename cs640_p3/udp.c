@@ -12,7 +12,12 @@ void* recvUdpMsg(void *socket_desc)
         {
             printf("%s", server_reply);
         }
+        else
+        {
+            break;
+        }
     }
+    return NULL;
 }
 
 void* sendUdpMsg(void *args)
@@ -47,7 +52,7 @@ void initUdpServer(char *hname, char *port, int kflag)
 
     if (hname)
     {
-        printf("[Debug]: Hostname %s\n",hname);
+        //printf("[Debug]: Hostname %s\n",hname);
         if (!GetIPfromString(hname, &addr))
         {
             if ( (he = gethostbyname( hname ) ) == NULL)
@@ -63,7 +68,7 @@ void initUdpServer(char *hname, char *port, int kflag)
             }
 
         }
-        printf("Connecting to Dst IPAdress: %s, Port: %d \n", inet_ntoa(addr.sin_addr), htons(atoi(port)));
+        //printf("Connecting to Dst IPAdress: %s, Port: %d \n", inet_ntoa(addr.sin_addr), htons(atoi(port)));
         server.sin_addr = addr.sin_addr;
     }
     else
@@ -75,8 +80,8 @@ void initUdpServer(char *hname, char *port, int kflag)
     {
         printf("[Error:] Could not create socket");
     }
-    else
-        printf("Udp Client Socket Created Successfully\n");
+    //else
+    //    printf("Udp Client Socket Created Successfully\n");
 
 
     server.sin_family = AF_INET;
@@ -91,11 +96,11 @@ void initUdpServer(char *hname, char *port, int kflag)
         printf("[Error:] Bind failed\n");
         return;
     }
-    printf("Bind done\n");
-    printf("Waiting for the first packet\n");
+    //printf("Bind done\n");
+    //printf("Waiting for the first packet\n");
 
     *new_sock = socket_desc;
-
+    memset(buffer,0,MAXLEN);
     while (TRUE)
     {
         if(recvfrom(socket_desc ,buffer , MAXLEN, 0, (SA*)&remaddr, &len)>0)
@@ -152,7 +157,7 @@ void initUdpClient(char *hname, char *port, char *saddr)
 
     if (hname)
     {
-        printf("[Debug]: Hostname %s\n",hname);
+        //printf("[Debug]: Hostname %s\n",hname);
         if (!GetIPfromString(hname, &addr))
         {
             if ( (he = gethostbyname( hname ) ) == NULL)
@@ -168,7 +173,7 @@ void initUdpClient(char *hname, char *port, char *saddr)
             }
 
         }
-        printf("Connecting to Dst IPAdress: %s, Port: %d \n", inet_ntoa(addr.sin_addr), atoi(port));
+        //printf("Connecting to Dst IPAdress: %s, Port: %d \n", inet_ntoa(addr.sin_addr), atoi(port));
         server.sin_addr = addr.sin_addr;
     }
     else
@@ -183,8 +188,8 @@ void initUdpClient(char *hname, char *port, char *saddr)
     {
         printf("[Error:] Could not create socket");
     }
-    else
-        printf("Udp Client Socket Created Successfully\n");
+    //else
+    //    printf("Udp Client Socket Created Successfully\n");
 
     /*server.sin_addr = addr.sin_addr ;*/
     server.sin_family = AF_INET;
@@ -199,7 +204,7 @@ void initUdpClient(char *hname, char *port, char *saddr)
     {
         if (!GetIPfromString(saddr, &myaddr))
         {
-             printf("[Error:] Invalid saddr provided\n");
+             printf("internal error\n");
              return;
         }
     }

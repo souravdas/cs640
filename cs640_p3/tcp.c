@@ -46,10 +46,11 @@ void initTcpClient(char *hname, char *port, char *saddr)
     struct sockaddr_in server, myaddr, addr;
     struct hostent *he;
     struct in_addr **addr_list;
+    int option = 1;
 
     if (hname)
     {
-        printf("[Debug]: Hostname %s\n",hname);
+        //printf("[Debug]: Hostname %s\n",hname);
         if (!GetIPfromString(hname, &addr))
         {
             if ( (he = gethostbyname( hname ) ) == NULL)
@@ -65,7 +66,7 @@ void initTcpClient(char *hname, char *port, char *saddr)
             }
 
         }
-        printf("Connecting to Dst IPAdress: %s, Port: %d \n", inet_ntoa(addr.sin_addr), (atoi(port)));
+        //printf("[Debug]: Connecting to Dst IPAdress: %s, Port: %d \n", inet_ntoa(addr.sin_addr), (atoi(port)));
         server.sin_addr = addr.sin_addr;
     }
     else
@@ -81,10 +82,14 @@ void initTcpClient(char *hname, char *port, char *saddr)
         printf("[Error:] Could not create socket");
     }
 
+    if (setsockopt(socket_desc, SOL_SOCKET, (SO_REUSEADDR), (char*) &option, sizeof(option)) < 0)
+    {
+        printf("internal error\n");
+    }
+
     server.sin_addr = addr.sin_addr ;
     server.sin_family = AF_INET;
     server.sin_port = htons(atoi(port) );
-
 
     /* Assign a dummy address to recv message */
     memset((char *)&myaddr, 0, sizeof(myaddr));
@@ -117,7 +122,7 @@ void initTcpClient(char *hname, char *port, char *saddr)
         printf("{Error:] connect error\n");
         return ;
     }
-    puts("Connected");
+    //puts("Connected");
     new_sock = malloc(1);
     *new_sock = socket_desc;
 
@@ -161,10 +166,10 @@ void initTcpServer(char *hname, char *port, int kflag)
     struct sockaddr_in server , client;
     struct hostent *he;
     struct in_addr **addr_list;
-
+    int option = 1; 
     if (hname)
     {
-        printf("[hostname]: %s\n",hname);
+        //printf("[hostname]: %s\n",hname);
         if (!GetIPfromString(hname, &addr))
         {
             if ( (he = gethostbyname( hname ) ) == NULL)
@@ -179,14 +184,13 @@ void initTcpServer(char *hname, char *port, int kflag)
             }
 
         }
-        else
-            printf("[debug:] GetIPfromString - IPAdress is %s\n", inet_ntoa(addr.sin_addr));
+        printf("[debug:] GetIPfromString - IPAdress is %s\n", inet_ntoa(addr.sin_addr));
         server.sin_addr = addr.sin_addr;
     }
     else
         server.sin_addr.s_addr = INADDR_ANY;
 
-
+    
     /*Create socket*/
     socket_desc = socket(AF_INET , SOCK_STREAM , 0);
     if (socket_desc == -1)
@@ -194,6 +198,10 @@ void initTcpServer(char *hname, char *port, int kflag)
         printf("[Error:] Could not create socket\n");
     }
 
+    if (setsockopt(socket_desc, SOL_SOCKET, (SO_REUSEADDR), (char*) &option, sizeof(option)) < 0)
+    {
+        printf("internal error\n");
+    }
     /*Prepare the sockaddr_in structure*/
     server.sin_family = AF_INET;
     server.sin_port = htons( atoi(port) );
@@ -204,16 +212,16 @@ void initTcpServer(char *hname, char *port, int kflag)
         printf("[Error:] Bind failed\n");
         return;
     }
-    printf("Bind done\n");
+    //printf("Bind done\n");
 
     /*listen*/
-    listen(socket_desc , 3);
+    listen(socket_desc , 10);
     /*Accept and incoming connection*/
-    printf("Waiting for incoming connections...\n");
+    //printf("Waiting for incoming connections...\n");
     c = sizeof(struct sockaddr_in);
     while( (new_socket = accept(socket_desc, (struct sockaddr *)&client, (socklen_t*)&c)) )
     {
-        printf("Connection accepted\n");
+        //printf("Connection accepted\n");
         new_sock = malloc(1);
         *new_sock = new_socket;
         if( pthread_create( &recv_thread , NULL , recvMsg , (void*) new_sock) < 0)
